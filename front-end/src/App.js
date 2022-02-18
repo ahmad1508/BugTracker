@@ -1,18 +1,26 @@
+import React, { useContext } from 'react'
 import {
   Route,
   Routes,
+  Navigate, useLocation
 } from "react-router-dom";
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-
+import Background from './components/Background'
+import './App.css'
 import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Context from "./Context";
+//import DashList from './pages/DashList'
+import Projects from './pages/Projects'
+
+import Header from './Header'
+import Footer from './Footer'
 
 
 const theme = createTheme({
+
   palette: {
-    background: {
-      default: '#E3F2FD'
-    },
     primary: {
       main: '#2196F3',
       light: '#E3F2FD',
@@ -42,18 +50,65 @@ const theme = createTheme({
       600: '#757575',
       700: '#616161',
       900: '#212121',
-    }
+    },
+
   },
 });
-
+const background = createTheme({
+  palette: {
+    background: {
+      default: "#E3F2FD",
+    }
+  }
+})
 
 function App() {
+  const { oauth, setAuth } = useContext(Context)
+  const location = useLocation()
+  const goHome = (
+    <Navigate
+      to={{
+        pathname: "/Login",
+        state: { from: location },
+      }}
+    />
+  )
+  const goDash = (
+    <Navigate
+      to={{
+        pathname: "/",
+        state: { from: location },
+      }}
+    />
+  )
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={oauth ? theme : background}>
       <CssBaseline />
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/Login" element={oauth ? goDash : <Login />} />
       </Routes>
+
+      <Routes>
+        <Route path="/" element={oauth ?
+          <Header >
+            <Background>
+              <Projects />
+            </Background>
+          </Header>
+          : goHome} />
+
+        <Route path="/Dashboard/" element={oauth ?
+          <Header >
+            <Background>
+              <Dashboard />
+            </Background>
+          </Header>
+          : goHome} />
+        {/* <Route path="/List" element={oauth ? <DashList /> : goHome} /> */}
+      </Routes>
+
+      <Footer />
+
     </ThemeProvider>
   );
 }

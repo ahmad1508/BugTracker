@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -10,22 +11,28 @@ import {
   IconButton,
   InputLabel,
   OutlinedInput,
-  FormControl
+  FormControl,
+  Container
 } from '@mui/material'
 import {
   VisibilityOff,
   Visibility
 } from '@mui/icons-material/';
 import { useTheme } from '@mui/material/styles';
-import { useInRouterContext } from 'react-router-dom';
+import GoogleLogin from 'react-google-login'
+import Context from '../Context'
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+
 
 
 const useStyles = (theme) => ({
+
   container: {
     height: '100vh',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    margin: '50px 0px',
   },
   login: {
     backgroundColor: '#fff',
@@ -34,7 +41,7 @@ const useStyles = (theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: '15px'
+    borderRadius: '15px',
   },
   or: {
     padding: '0.3rem 4rem',
@@ -43,9 +50,6 @@ const useStyles = (theme) => ({
     fontWeight: 600,
   },
   google: {
-    color: theme.palette.grey[900],
-    fontWeight: 550,
-    width: "85%",
     backgroundColor: theme.palette.grey[50],
     border: "1px solid #EEEEEE",
     marginBottom: '2rem'
@@ -65,34 +69,46 @@ const useStyles = (theme) => ({
     backgroundColor: theme.palette.secondary.main,
     marginTop: "20px",
     width: "100%",
+  },
+  otherAccount: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: "100%",
+    marginBottom: "20px"
   }
 })
 
 
 function Login() {
   const styles = useStyles(useTheme())
+
   return (
-    <Box sx={styles.container}>
-      <Box sx={styles.login}>
-        <Box sx={{ margin: "1rem 0rem 1rem 0rem" }}>
-          Logo
-        </Box>
+      <Box sx={styles.container}>
+        <Container sx={styles.login}>
+          <Box sx={{ margin: "1rem 0rem 1rem 0rem" }}>
+            <img src="logo_app.png" alt="" />
+          </Box>
 
-        <Typography variant="h6" sx={styles.title}>Sign up</Typography>
+          <Typography variant="h6" sx={styles.title}> Login with google</Typography>
 
-        <Typography variant="" sx={{ marginBottom: "1rem", color: "#9E9E9E" }}>Enter yout credentials to continue</Typography>
+          <Typography variant="" sx={{ marginBottom: "1rem", color: "#9E9E9E" }}>Enter yout credentials to continue</Typography>
 
-        <Button variant="" sx={styles.google} >
-          <img src="Google.svg" alt="google" height="20px" />
-          <Typography variant="" sx={{ marginLeft: "15px" }}>Sign Up With Google</Typography>
-        </Button>
 
-        <Divider style={{ width: '85%', marginBottom: '2rem' }} >
-          <Box sx={styles.or}>Or</Box>
-        </Divider>
-        <Form />
+          <Box variant="" sx={styles.google} >
+            <Google />
+            {/*  <img src="Google.svg" alt="google" height="20px" />
+          <Typography variant="" sx={{ marginLeft: "15px" }}>Sign Up With Google</Typography> */}
+          </Box>
+
+          <Divider sx={{ width: '85%', marginBottom: '2rem' }} >
+            <Box sx={styles.or}>Or</Box>
+          </Divider>
+          <Form />
+          <Account />
+        </Container>
       </Box>
-    </Box>
   )
 }
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -118,7 +134,7 @@ function Form() {
     setPassword(e.target.value)
   }
   const handleSubmit = async (e) => {
-    e.preventDefault() 
+    e.preventDefault()
     setFirstName('')
     setLastName('')
     setEmail('')
@@ -173,7 +189,7 @@ function Form() {
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
 
           <OutlinedInput
-            
+
 
             label="Password"
             id="outlined-adornment-password"
@@ -209,4 +225,86 @@ function Form() {
 
 
 
+
+function Account() {
+  const styles = useStyles(useTheme())
+
+  return (
+    <Box sx={styles.otherAccount}>
+      <Divider sx={{ width: '85%', marginBottom: '1rem' }} />
+      <Link to="/sign-in" style={{ textDecoration: 'none', color: useTheme().palette.secondary.main }}>Already have an account ?</Link>
+    </Box>
+  )
+}
+
+
+
 export default Login
+
+
+
+function Google() {
+  const location = useLocation();
+  const { cookies, oauth, setAuth,profile,setProfile } = useContext(Context)
+  const [loginData, setLoginData] = useState(cookies)
+
+  /* localStorage.getItem('loginData') ?
+  JSON.parse(localStorage.getItem('loginData'))
+  : null */
+  const handleFailure = (result) => {
+    alert(result)
+  }
+  const handleLogin = async (googleData) => {
+    console.log(googleData)
+    //verify the conformity of the tokenID received by sending to backend and using veridyIdToken
+    const res = await fetch('http://localhost:5000/api/google-login', {
+      method: 'POST',
+      body: JSON.stringify({
+        token: googleData.tokenId,
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const data = await res.json()
+    console.log(data)
+    setLoginData(data)
+    await setProfile(data)
+
+    //localStorage.setItem('loginData', JSON.stringify(data))
+    //set cookies and auth
+    await setAuth(googleData.wc)
+
+  }
+
+  const handleLogout = () => {
+    setAuth("")
+    /* localStorage.removeItem('loginData'); */
+    setLoginData(null)
+  }
+  return (
+    <div>
+      {loginData ? (
+        <Navigate
+          to={{
+            pathname: "/",
+            state: { from: location },
+          }}
+        />
+      ) : (
+
+        <GoogleLogin
+          clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+          buttonText="Log in with google"
+          onSuccess={handleLogin}
+          onFailure={handleFailure}
+          cookiePolicy={'single_host_origin'}
+        ></GoogleLogin>
+
+      )
+
+      }
+    </div>
+  )
+}

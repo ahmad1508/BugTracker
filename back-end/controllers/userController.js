@@ -1,22 +1,28 @@
 const User = require("../models/user");
 
-const get_users = (req, res) => {
-    User.find().then(result => {
-        res.send(result)
+/* const get_users = (ticket) => {
+    console.log("hello")
+    console.log(ticket)
+    User.findOne({ googleId: ticket.payload.sub }).then(result=>{
+        return result
     })
-}
+     User.find().then(result => {
+        return result
+    }) 
+} */
 
-const create_user = (req, res) => {
+const create_user = (ticket) => {
     const user = new User({
-        email: "ramisonji99@gmail.com",
-        password: "123456",
+        googleId: ticket.payload.sub,
+        email: ticket.payload.email,
+        name: ticket.payload.name,
+        picture: ticket.payload.picture,
     })
     user.save().then(result => {
-        res.send(result)
+        console.log(result)
     })
 }
 
 module.exports = {
-    get_users,
     create_user
 };

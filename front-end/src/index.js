@@ -1,21 +1,27 @@
-import ReactDOM from 'react-dom';
-
-// third party
-import { BrowserRouter } from 'react-router-dom';
-
-// project imports
-import App from './App';
-
-// style + assets
-
+import React from "react";
+import ReactDOM from "react-dom";
+import { CookiesProvider } from "react-cookie";
+import "./index.css";
+import App from "./App";
+import { Provider as ContextProvider } from "./Context";
+import * as serviceWorker from "./serviceWorker";
+// Layout
+import { BrowserRouter as Router } from "react-router-dom";
 
 ReactDOM.render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>,
-  document.getElementById('root')
+  <React.StrictMode>
+    <ContextProvider>
+      <CookiesProvider>
+        <Router>
+          <App />
+        </Router>
+      </CookiesProvider>
+    </ContextProvider>
+  </React.StrictMode>,
+  document.getElementById("root")
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();
