@@ -1,8 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 import { Box, Typography, Divider, Paper, Container, Grid, Button, TextField } from '@mui/material'
 import Context from '../Context'
-import './css/Projects.css'
 import { Navigate, useLocation, Link } from 'react-router-dom'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -11,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
+import axios from 'axios'
 
 const useStyles = (theme) => ({
   container: {
@@ -84,11 +84,7 @@ const useStyles = (theme) => ({
 
 export default function Projects() {
   const styles = useStyles(useTheme())
-  const { oauth, setAuth } = useContext(Context)
-  const location = useLocation()
-  console.log(oauth)
-
-
+  const { oauth, setAuth, projects, setProjects, profile } = useContext(Context)
 
 
 
@@ -116,7 +112,13 @@ export default function Projects() {
             </Box>
           </Box>
           <Divider sx={{ width: "100%" }} />
-          <ProjectList id='123' />
+          {projects && projects.map((project) => (
+            <Box>
+              <ProjectList project={project} key={project.projectId} />
+              {(projects.length - 1) !== projects.indexOf(project) && <Divider />}
+
+            </Box>
+          ))}
 
 
         </Box>
@@ -126,17 +128,19 @@ export default function Projects() {
 }
 
 
-const ProjectList = ({ id }) => {
+const ProjectList = ({ project }) => {
   const styles = useStyles(useTheme())
 
+
   return (
-    <Link to={`/Dashboard/${id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/Dashboard/${project.projectId}`} style={{ textDecoration: 'none' }}>
       <Grid container sx={styles.accordion}>
+
         <Grid item xs={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>Project Title</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>{project.title}  {project.status}</Typography>
         </Grid>
         <Grid item xs={8} md={6} lg={6} sx={{ maxHeight: '60px', overflow: 'auto' }}>
-          <Typography variant="caption" >Peoject description</Typography>
+          <Typography variant="caption" >{project.description}</Typography>
         </Grid>
         <Grid item xs={0} md={1} lg={1} sx={{ maxHeight: '60px', overflow: 'auto' }}>
         </Grid>
@@ -180,7 +184,8 @@ const NewProjectForms = ({ open }) => {
   const styles = useStyles(useTheme())
   const [title, setTitle] = useState('')
   const [status, setStatus] = useState('Public')
-  const [desctiption, setDescription] = useState('')
+  const [description, setDescription] = useState('')
+  const { oauth, profile, setProjects ,projects} = useContext(Context)
 
   const handleTitle = (e) => {
     setTitle(e.target.value)
@@ -194,13 +199,23 @@ const NewProjectForms = ({ open }) => {
     setDescription(e.target.value)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setTitle('')
     setStatus('Public')
     setDescription('')
+    console.log(profile.googleId)
+    const project = {
+      title,
+      status,
+      description,
+      owner: profile.googleId,
+      participants: [profile.googleId]
+    }
     //add code here
-
+    const { data: res } = await axios.post('http://localhost:5000/api/project', project)
+    setProjects([...projects, res])
+    console.log(res)
   }
 
   return (
@@ -241,7 +256,7 @@ const NewProjectForms = ({ open }) => {
           variant="outlined"
           type='text'
           onChange={handleDescription}
-          value={desctiption}
+          value={description}
           multiline
           rows={2}
           sx={{ width: '100%' }} />

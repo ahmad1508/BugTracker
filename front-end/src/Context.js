@@ -5,10 +5,11 @@ import { Buffer } from 'buffer';
 const Context = React.createContext();
 export default Context;
 export const Provider = ({ children }) => {
-    const [cookies, setCookie, removeCookie] = useCookies(["oauth"]);
+    const [cookies, setCookie, removeCookie] = useCookies(["oauth", "profile"]);
     const [oauth, setAuth] = useState(cookies.oauth);
     const [profile, setProfile] = useState(cookies.profile)
-    
+    const [projects, setProjects] = useState([])
+
     console.log(cookies.profile)
     return (
         <Context.Provider
@@ -29,20 +30,25 @@ export const Provider = ({ children }) => {
 
                     } else {
                         removeCookie("oauth")
-                        removeCookie("profile");
-
-
+                        setProfile(null)
                     }
                     setAuth(oauth);
+
                 },
                 profile: profile,
                 setProfile: (profile) => {
-                    setCookie("profile", profile)
-                    
-                }
+                    if (profile) {
+                        setCookie("profile", profile)
+                        setProfile(profile)
+                    }else{
+                        removeCookie("profile");
+                    }
+                },
+                projects: projects,
+                setProjects: setProjects
             }}
         >
             {children}
-        </Context.Provider>
+        </Context.Provider >
     )
 }

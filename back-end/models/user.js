@@ -21,6 +21,11 @@ const user = new Schema({
         type: String,
         required: false,
     },
+    projects:{
+        type:Array,
+        required:true,
+        default:[]
+    }
 
 }, { timestamp: true })
 

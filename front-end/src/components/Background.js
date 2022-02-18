@@ -1,13 +1,13 @@
-import React, { useContext } from 'react'
+import React, { useContext,useEffect } from 'react'
 import { useTheme } from '@mui/material/styles'
 import { Box } from '@mui/material'
 import Context from '../Context'
 import { Navigate, useLocation } from 'react-router-dom'
-
+import axios from 'axios'
 
 const useStyles = (theme) => ({
     container: {
-        backgroundColor: "#E3F2FD",
+        backgroundColor: theme.palette.primary.light,
         position: 'relative',
         minHeight: '90vh',
         margin: '10px 15px 0px 0px',
@@ -24,7 +24,7 @@ const useStyles = (theme) => ({
 
 export default function Dashboard({children}) {
     const styles = useStyles(useTheme())
-
+   
     return (
         <Box className='dashboard' sx={styles.container}>
             {children}

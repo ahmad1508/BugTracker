@@ -63,8 +63,12 @@ const background = createTheme({
 })
 
 function App() {
-  const { oauth, setAuth } = useContext(Context)
+  const { oauth, setAuth, projects, setProjects, profile } = useContext(Context)
   const location = useLocation()
+
+
+
+
   const goHome = (
     <Navigate
       to={{
@@ -86,30 +90,13 @@ function App() {
       <CssBaseline />
       <Routes>
         <Route path="/Login" element={oauth ? goDash : <Login />} />
+        <Route path="/" element={oauth ? <Header ><Background><Projects /></Background></Header> : goHome} />
+        <Route path="/Dashboard/:id/" element={oauth ? <Header ><Background><Dashboard /></Background></Header> : goHome} />
       </Routes>
 
-      <Routes>
-        <Route path="/" element={oauth ?
-          <Header >
-            <Background>
-              <Projects />
-            </Background>
-          </Header>
-          : goHome} />
 
-        <Route path="/Dashboard/" element={oauth ?
-          <Header >
-            <Background>
-              <Dashboard />
-            </Background>
-          </Header>
-          : goHome} />
-        {/* <Route path="/List" element={oauth ? <DashList /> : goHome} /> */}
-      </Routes>
 
-      <Footer />
-
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }
 

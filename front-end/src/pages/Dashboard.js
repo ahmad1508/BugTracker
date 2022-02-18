@@ -1,8 +1,9 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
-import { Box, Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography, Paper } from '@mui/material'
 import Context from '../Context'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, useLocation, useParams } from 'react-router-dom'
+import axios from 'axios'
 
 
 const useStyles = (theme) => ({
@@ -11,23 +12,22 @@ const useStyles = (theme) => ({
     backgroundColor: theme.palette.grey[50],
     margin: "10px",
     borderRadius: '10px',
-    padding:'20px'
+    padding: '20px'
   },
   boxTitle: {
     fontWeight: 600,
     display: 'flex',
     justifyContent: 'center',
-    marginBottom:"10px"
+    marginBottom: "10px"
   },
   task: {
-    boxShadow: 3,
- 
+    boxShadow: 2,
     p: 1,
     borderRadius: 2,
     textAlign: 'center',
     fontSize: '0.875rem',
     fontWeight: '700',
-    width:'100%'
+    width: '100%'
 
   }
 })
@@ -35,54 +35,76 @@ const useStyles = (theme) => ({
 
 export default function Dashboard() {
   const styles = useStyles(useTheme())
-  const { oauth, setAuth } = useContext(Context)
+  const { oauth, setAuth, projects, setProjects } = useContext(Context)
   const location = useLocation()
-  console.log(oauth)
+  const current_project_id = useParams()
+  const [todo, setToDo] = useState([])
+  const [doing, setDoing] = useState([])
+  const [done, setDone] = useState([])
 
 
 
+
+  useEffect(() => {
+    const fetch_issues = async () => {
+      const { data: issues } = await axios.post('http://localhost:5000/api/get_issues', current_project_id)
+      setToDo(issues.Todo)
+      setDoing(issues.Doing)
+      setDone(issues.Done)
+
+    }
+    fetch_issues()
+  }, [oauth, projects])
 
   return (
     <Box>
       <Grid container>
         <Grid item xs={12} md={4} lg={4}>
-          <Box sx={styles.column}>
+          <Paper elevation={6} sx={styles.column}>
             <Typography variant="body1" sx={styles.boxTitle}>To do</Typography>
-            <Box
-              sx={styles.task}
-            >
-              boxShadow: 0
-            </Box>
+
+            {todo.map((task) => (
+              <Box
+                sx={styles.task}
+              >
+                {task.title}
+              </Box>
+            ))}
 
 
-          </Box>
+
+          </Paper>
         </Grid>
         <Grid item xs={12} md={4} lg={4}>
-          <Box sx={styles.column}>
+          <Paper elevation={6} sx={styles.column}>
             <Typography variant="body1" sx={styles.boxTitle}>In Progress</Typography>
+            {doing.map((task) => (
             <Box
               sx={styles.task}
             >
-              boxShadow: 0
+              {task.title}
             </Box>
+            ))}
 
 
 
 
-          </Box>
+          </Paper>
         </Grid>
         <Grid item xs={12} md={4} lg={4}>
-          <Box sx={styles.column}>
+          <Paper elevation={6} sx={styles.column}>
             <Typography variant="body1" sx={styles.boxTitle}>Done</Typography>
+            {done.map((task) => (
             <Box
               sx={styles.task}
             >
-              boxShadow: 0
+              {task.title}
             </Box>
+            ))}
 
 
 
-          </Box>
+          </Paper>
         </Grid>
       </Grid>
     </Box>

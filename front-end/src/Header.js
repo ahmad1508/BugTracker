@@ -24,7 +24,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Avatar from '@mui/material/Avatar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
-
+import axios from 'axios'
 import Context from './Context'
 
 const drawerWidth = 240;
@@ -195,12 +195,18 @@ export default function Header({ children }) {
   const location = useLocation()
   const [search, setSearch] = useState('')
   const [pathname, setPathname] = useState('')
-  const Navigate = useNavigate()
+
+  const { oauth, setAuth, projects, setProjects, profile } = useContext(Context)
 
   useEffect(() => {
-    setPathname(location.pathname)
-  }, [location.pathname])
-
+      const fetch = async () => {
+        const { data: all_projects } = await axios.post('http://localhost:5000/api/get_projects',
+          profile.projects
+        )
+        setProjects(all_projects)
+      }
+      fetch()
+    }, [oauth, setProjects])
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -219,10 +225,10 @@ export default function Header({ children }) {
     <Box>
       <Box sx={{ display: 'flex', position: 'relative' }}>
         <CssBaseline />
-        <AppBar sx={styles.bar} elevation={0} open={open}>
+        <AppBar sx={styles.bar} elevation={0}>
           <Toolbar>
             <Link to="/">
-              <img src="logo_app.png" alt="" height='50px' />
+              <img src="/logo_app.png" alt="Logo" height='50px' />
             </Link>
             <IconButton
               aria-label="open drawer"
@@ -245,7 +251,7 @@ export default function Header({ children }) {
           </Toolbar>
         </AppBar>
 
-        <Drawer variant="permanent" open={open}>
+        <Drawer variant="permanent" open={open} >
           <DrawerHeader>
 
           </DrawerHeader>
@@ -261,27 +267,11 @@ export default function Header({ children }) {
               </Typography>
             }
 
+            {projects && projects.map(project => (
+              <DrawerProject project={project} key={project.projectId} />
+            ))}
 
 
-            <Link to="/Dashboard" style={{ display: 'flex', textDecoration: 'none', color: `${theme.palette.secondary.main}` }}>
-              <ListItem button sx={pathname === '/Dashboard' ? styles.listItemSelected : styles.listItem}>
-                <ListItemIcon >
-                  <Avatar sx={styles.avatar}>BT</Avatar>
-                  {/*  <AccountTreeIcon sx={{ color: `${theme.palette.secondary.main}` }} /> */}
-                </ListItemIcon>
-                <ListItemText primary='Bug Tracker' />
-              </ListItem>
-            </Link>
-
-            {/* <Link to="/List" style={{ display: 'flex', textDecoration: 'none', color: `${theme.palette.secondary.main}` }}>
-              <ListItem button
-                sx={pathname === '/List' ? styles.listItemSelected : styles.listItem} >
-                <ListItemIcon>
-                  <Avatar sx={styles.avatar}>P</Avatar>
-                </ListItemIcon>
-                <ListItemText primary='List View' />
-              </ListItem>
-            </Link> */}
           </List>
 
         </Drawer>
@@ -295,6 +285,28 @@ export default function Header({ children }) {
   )
 }
 
+const DrawerProject = ({ project }) => {
+  const theme = useTheme();
+  const styles = useStyles(theme)
+  const Navigate = useNavigate()
+  const [pathname, setPathname] = useState('')
+  const location = useLocation()
+  useEffect(() => {
+    setPathname(location.pathname)
+  }, [location.pathname])
+
+
+  return (
+    <Link to={`/Dashboard/${project.projectId}`} style={{ display: 'flex', textDecoration: 'none', color: `${theme.palette.secondary.main}` }}>
+      <ListItem button sx={pathname === `/Dashboard/${project.projectId}` ? styles.listItemSelected : styles.listItem}>
+        <ListItemIcon >
+          <Avatar sx={styles.avatar}>{project.title[0].toUpperCase()}{project.title[1].toUpperCase()}</Avatar>
+        </ListItemIcon>
+        <ListItemText primary='Bug Tracker' />
+      </ListItem>
+    </Link>
+  )
+}
 
 /*************************************
  *           Search Bar
@@ -406,15 +418,18 @@ const logoutStyles = (theme) => ({
 
 const Control = () => {
   const styles = logoutStyles(useTheme())
-  const { profile, setAuth } = useContext(Context)
+  const { profile, cookies, setAuth } = useContext(Context)
 
   const handleLogout = () => {
     setAuth(null)
   }
 
+  console.log(profile)
+
   return (
     <Box sx={styles.info}>
       <Avatar sx={styles.photo} alt="Remy Sharp" src={profile.picture} />
+
       <Button sx={styles.logout} variant="contained" disableElevation onClick={handleLogout}><LogoutIcon /></Button>
     </Box>
   )
