@@ -12,6 +12,10 @@ const create_user = (ticket) => {
     })
 }
 
+const get_user = async (id,res)=>{
+    const user = User.findOne({googleId:id})
+    res.send(user)
+}
 
 const update_user = async (userId,project)=>{
     const user = await User.findOne({ googleId: userId })

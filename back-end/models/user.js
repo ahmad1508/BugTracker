@@ -13,6 +13,10 @@ const user = new Schema({
         match: /.+\@.+\..+/,
         unique: true
     },
+    pseudo:{
+        type: String,
+        required: false,
+    },
     name: {
         type: String,
         required: false,

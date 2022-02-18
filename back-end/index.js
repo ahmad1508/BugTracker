@@ -49,6 +49,10 @@ app.post('/api/google-login', async (req, res) => {
     }
 })
 
+app.post('/api/getUser',async (req,res)=>{
+    userController.get_user(res.params.id,res)
+})
+
 app.post('/api/project', (req, res) => {
     const projectId = 'project:' + uuidv4()
     const project = req.body
