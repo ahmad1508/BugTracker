@@ -4,11 +4,11 @@ const mongoose = require('mongoose')
 const keys = require('./config/keys')
 const User = require("./models/user");
 const Project = require("./models/project");
-const Issue = require("./models/issue");
+const Task = require("./models/task");
 
 const userController = require('./controllers/userController')
 const projectController = require('./controllers/projectController')
-const issueController = require('./controllers/issueController')
+const taskController = require('./controllers/taskController')
 
 const dotenv = require('dotenv')
 const cors = require('cors')
@@ -25,7 +25,9 @@ app.use(express.json())
 app.use(cors()) //and this
 
 
-
+/*************************************************************
+ *                      Login Routes
+ *************************************************************/
 //token verification and user creation
 app.post('/api/google-login', async (req, res) => {
     //Verify token
@@ -49,10 +51,23 @@ app.post('/api/google-login', async (req, res) => {
     }
 })
 
-app.post('/api/getUser',async (req,res)=>{
-    userController.get_user(res.params.id,res)
+
+
+
+
+
+/*************************************************************
+ *                      User Routes
+ *************************************************************/
+app.post('/api/getUser', async (req, res) => {
+    userController.get_user(res.params.id, res)
 })
 
+
+
+/*************************************************************
+ *                      Project Routes
+ *************************************************************/
 app.post('/api/project', (req, res) => {
     const projectId = 'project:' + uuidv4()
     const project = req.body
@@ -62,13 +77,11 @@ app.post('/api/project', (req, res) => {
     projectController.create_project(project)
     const user = userController.update_user(project.owner, project)
 
-    console.log(user)
     res.status(200).send(project)
 })
 
 app.post('/api/get_projects', async (req, res) => {
-    console.log('bdy')
-    console.log(req.body)
+
     const projectsId = req.body
     const projects = []
 
@@ -86,36 +99,50 @@ app.post('/api/get_projects', async (req, res) => {
 
 
 
-app.get('/api/create_issue', async (req, res) => {
-    issueController.create_issue()
+
+
+/*************************************************************
+ *                      Tasks routes Routes
+ *************************************************************/
+app.post('/api/create_task', async (req, res) => {
+    const task = req.body
+    const taskId = 'task:'+uuidv4()
+    task.taskId = taskId
+    taskController.create_Task(task,res)
+
+    
 })
-
-app.post('/api/get_issues', async (req, res) => {
+app.post('/api/get_tasks', async (req, res) => {
     const projectId = req.body.id
-    console.log(projectId)
-    const Todo = []
-    const Doing = []
-    const Done = []
+    const todo = []
+    const doing = []
+    const done = []
 
-    const issues = await Issue.find()
-    issues.forEach(issue => {
-        if (issue.projectId === projectId) {
-            if (issue.status === 'Todo') {
-                Todo.push(issue)
-            } else if (issue.status === 'Doing') {
-                Doing.push(issue)
-            } else if (issue.status === 'Done') {
-                Done.push(issue)
+    const tasks = await Task.find()
+    
+    tasks.forEach(task => {
+        if (task.projectId === projectId) {
+            if (task.status === 'todo') {
+                todo.push(task)
+            } else if (task.status === 'doing') {
+                doing.push(task)
+            } else if (task.status === 'done') {
+                done.push(task)
             }
         }
     })
-    const all_issues = {
-        Todo,
-        Doing,
-        Done
+    const all_tasks = {
+        todo,
+        doing,
+        done
     }
-    res.status(200).send(all_issues)
+    res.status(200).send(all_tasks)
 })
+
+
+
+
+
 
 
 const PORT = process.env.PORT || 5000

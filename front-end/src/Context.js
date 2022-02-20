@@ -9,15 +9,13 @@ export const Provider = ({ children }) => {
     const [oauth, setAuth] = useState(cookies.oauth);
     const [profile, setProfile] = useState(cookies.profile)
     const [projects, setProjects] = useState([])
+    const [currentProject, setCurrentProject] = useState(null)
 
-    console.log(cookies.profile)
     return (
         <Context.Provider
             value={{
                 oauth: oauth,
                 setAuth: (oauth) => {
-                    console.log(profile)
-                    console.log(oauth)
 
                     if (oauth) {
                         const payload = JSON.parse(
@@ -40,12 +38,17 @@ export const Provider = ({ children }) => {
                     if (profile) {
                         setCookie("profile", profile)
                         setProfile(profile)
-                    }else{
+                    } else {
                         removeCookie("profile");
                     }
                 },
                 projects: projects,
-                setProjects: setProjects
+                setProjects: setProjects,
+                currentProject: currentProject,
+                setCurrentProject: (id) => {
+                    const project = projects.find((project) => project.projectId === id)
+                    setCurrentProject(project)
+                }
             }}
         >
             {children}

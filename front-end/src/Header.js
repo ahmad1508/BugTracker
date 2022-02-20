@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { styled, useTheme } from '@mui/material/styles';
-import { useLocation, useNavigate, Link } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Box from '@mui/material/Box';
+import Link from '@mui/material/Link'
 import MuiDrawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
 import MuiAppBar from '@mui/material/AppBar';
@@ -23,7 +24,6 @@ import Button from '@mui/material/Button';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Avatar from '@mui/material/Avatar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import axios from 'axios'
 import Context from './Context'
 
@@ -192,21 +192,22 @@ export default function Header({ children }) {
   const theme = useTheme();
   const styles = useStyles(theme)
   const [open, setOpen] = React.useState(false);
-  const location = useLocation()
   const [search, setSearch] = useState('')
   const [pathname, setPathname] = useState('')
+  const {setCurrentProject} = useContext(Context)
+  const navigate = useNavigate()
 
   const { oauth, setAuth, projects, setProjects, profile } = useContext(Context)
 
   useEffect(() => {
-      const fetch = async () => {
-        const { data: all_projects } = await axios.post('http://localhost:5000/api/get_projects',
-          profile.projects
-        )
-        setProjects(all_projects)
-      }
-      fetch()
-    }, [oauth, setProjects])
+    const fetch = async () => {
+      const { data: all_projects } = await axios.post('http://localhost:5000/api/get_projects',
+        profile.projects
+      )
+      setProjects(all_projects)
+    }
+    fetch()
+  }, [oauth, setProjects])
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -227,7 +228,11 @@ export default function Header({ children }) {
         <CssBaseline />
         <AppBar sx={styles.bar} elevation={0}>
           <Toolbar>
-            <Link to="/">
+            <Link to="/" sx={{cursor:'pointer'}} onClick={(e) => {
+              e.preventDefault()
+              setCurrentProject(null)
+              navigate('/')
+            }}>
               <img src="/logo_app.png" alt="Logo" height='50px' />
             </Link>
             <IconButton
@@ -288,7 +293,7 @@ export default function Header({ children }) {
 const DrawerProject = ({ project }) => {
   const theme = useTheme();
   const styles = useStyles(theme)
-  const Navigate = useNavigate()
+  const navigate = useNavigate()
   const [pathname, setPathname] = useState('')
   const location = useLocation()
   useEffect(() => {
@@ -297,7 +302,18 @@ const DrawerProject = ({ project }) => {
 
 
   return (
-    <Link to={`/Dashboard/${project.projectId}`} style={{ display: 'flex', textDecoration: 'none', color: `${theme.palette.secondary.main}` }}>
+    <Link
+      to={`/Dashboard/${project.projectId}`}
+      style={{
+        display: 'flex',
+        textDecoration: 'none',
+        color: `${theme.palette.secondary.main}`
+      }}
+      onClick={(e) => {
+        e.preventDefault()
+        navigate(`/Dashboard/${project.projectId}`)
+      }}
+    >
       <ListItem button sx={pathname === `/Dashboard/${project.projectId}` ? styles.listItemSelected : styles.listItem}>
         <ListItemIcon >
           <Avatar sx={styles.avatar}>{project.title[0].toUpperCase()}{project.title[1].toUpperCase()}</Avatar>
@@ -424,7 +440,6 @@ const Control = () => {
     setAuth(null)
   }
 
-  console.log(profile)
 
   return (
     <Box sx={styles.info}>
