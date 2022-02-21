@@ -1,9 +1,9 @@
 const Project = require("../models/project");
 
-const create_project = (proj)=>{
+const create_project = (proj,res)=>{
     const project = new Project(proj)
     project.save().then(result=>{
-        console.log(result)
+        res.send(result)
     })
 }
 

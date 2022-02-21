@@ -2,11 +2,12 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 import { Box, Grid, Typography, Paper, Button, Link, TextField } from '@mui/material'
 import Context from '../Context'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { resolvePath, useLocation, useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import AddIcon from '@mui/icons-material/Add';
 import { useInput } from '@mui/base';
 import { styled } from '@mui/system';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 const useStyles = (theme) => ({
   column: {
@@ -20,38 +21,59 @@ const useStyles = (theme) => ({
     fontWeight: 600,
     display: 'flex',
   },
-  todo: {
+  todoContainer: {
     boxShadow: 2,
-    p: 1,
+    p: 1.5,
     marginBottom: '10px',
     borderRadius: 2,
-    textAlign: 'center',
     fontSize: '0.875rem',
     fontWeight: '700',
     width: '100%',
-    bgcolor: theme.palette.primary.medium
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2,1fr)',
+    bgcolor: theme.palette.primary.medium,
   },
-  doing: {
+  todoInfo: {
+  },
+  todoEdit: {
+    display:'flex',
+    justifyContent:'flex-end'
+  },
+  doingContainer: {
     boxShadow: 2,
-    p: 1,
+    p: 1.5,
     marginBottom: '10px',
     borderRadius: 2,
-    textAlign: 'center',
     fontSize: '0.875rem',
     fontWeight: '700',
     width: '100%',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2,1fr)',
     bgcolor: theme.palette.secondary.medium
   },
-  done: {
+  doingInfo: {
+  },
+  doingEdit: {
+    display:'flex',
+    justifyContent:'flex-end'
+  },
+  doneContainer: {
     boxShadow: 2,
-    p: 1,
+    p: 1.5,
     marginBottom: '10px',
     borderRadius: 2,
-    textAlign: 'center',
     fontSize: '0.875rem',
     fontWeight: '700',
     width: '100%',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2,1fr)',
     bgcolor: '#4caf50'
+  },
+  doneInfo: {
+  },
+  doneEdit: {
+    display:'flex',
+    justifyContent:'flex-end'
   },
   count: {
     border: "1px solid black",
@@ -241,18 +263,21 @@ export default function Dashboard() {
                     <Button sx={styles.submitButton} onClick={(e) => handleSubmitTask(e, 'todo')}>Add</Button>
                   </Grid>
                   <Grid item xs={12} md={6} lg={6} sx={{ padding: '5px' }}>
-                    <Button sx={styles.cancelButton}>Cancel</Button>
+                    <Button sx={styles.cancelButton} onClick={() => setOpenTodo(false)}>Cancel</Button>
                   </Grid>
                 </Grid>
               </Box>
             }
 
             {todo.map((task) => (
-              <Box
-                sx={styles.todo}
-              >
-                <Typography variant='subtitle1'><strong>{task.title}</strong></Typography>
-                <Typography variant='caption'>Added by {task.creator}</Typography>
+              <Box sx={styles.todoContainer}>
+                <Box sx={styles.todoInfo}>
+                  <Typography variant='subtitle1'><strong>{task.title}</strong></Typography>
+                  <Typography variant='caption'>Added by {task.creator}</Typography>
+                </Box>
+                <Box sx={styles.todoEdit}>
+                  <MoreHorizIcon />
+                </Box>
               </Box>
             ))}
 
@@ -285,7 +310,7 @@ export default function Dashboard() {
                     <Button sx={styles.submitButton} onClick={(e) => handleSubmitTask(e, 'doing')}>Add</Button>
                   </Grid>
                   <Grid item xs={12} md={6} lg={6} sx={{ padding: '5px' }}>
-                    <Button sx={styles.cancelButton}>Cancel</Button>
+                    <Button sx={styles.cancelButton} onClick={() => setOpenDoing(false)}>Cancel</Button>
                   </Grid>
                 </Grid>
               </Box>
@@ -294,11 +319,14 @@ export default function Dashboard() {
 
 
             {doing.map((task) => (
-              <Box
-                sx={styles.doing}
-              >
-                <Typography variant='subtitle1'><strong>{task.title}</strong></Typography>
-                <Typography variant='caption'>Added by {task.creator}</Typography>
+              <Box sx={styles.doingContainer}>
+                <Box sx={styles.doingInfo}>
+                  <Typography variant='subtitle1'><strong>{task.title}</strong></Typography>
+                  <Typography variant='caption'>Added by {task.creator}</Typography>
+                </Box>
+                <Box sx={styles.doingEdit}>
+                  <MoreHorizIcon />
+                </Box>
               </Box>
             ))}
 
@@ -331,7 +359,7 @@ export default function Dashboard() {
                     <Button sx={styles.submitButton} onClick={(e) => handleSubmitTask(e, 'done')}>Add</Button>
                   </Grid>
                   <Grid item xs={12} md={6} lg={6} sx={{ padding: '5px' }}>
-                    <Button sx={styles.cancelButton}>Cancel</Button>
+                    <Button sx={styles.cancelButton} onClick={() => setOpenDone(false)}>Cancel</Button>
                   </Grid>
                 </Grid>
               </Box>
@@ -339,11 +367,14 @@ export default function Dashboard() {
 
 
             {done.map((task) => (
-              <Box
-                sx={styles.done}
-              >
-                <Typography variant='subtitle1'><strong>{task.title}</strong></Typography>
-                <Typography variant='caption'>Added by {task.creator}</Typography>
+              <Box sx={styles.doneContainer}>
+                <Box sx={styles.doneInfo}>
+                  <Typography variant='subtitle1'><strong>{task.title}</strong></Typography>
+                  <Typography variant='caption'>Added by {task.creator}</Typography>
+                </Box>
+                <Box sx={styles.doneEdit}>
+                  <MoreHorizIcon />
+                </Box>
               </Box>
             ))}
           </Paper>

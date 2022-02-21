@@ -7,8 +7,10 @@ export default Context;
 export const Provider = ({ children }) => {
     const [cookies, setCookie, removeCookie] = useCookies(["oauth", "profile"]);
     const [oauth, setAuth] = useState(cookies.oauth);
-    const [profile, setProfile] = useState(cookies.profile)
-    const [projects, setProjects] = useState([])
+    const [profile, setProfile] = useState(localStorage.getItem('profile') ?
+        JSON.parse(localStorage.getItem('profile')) : null)
+    const [projects, setProjects] = useState(localStorage.getItem('projects') ?
+        JSON.parse(localStorage.getItem('projects')) : null)
     const [currentProject, setCurrentProject] = useState(null)
 
     return (
@@ -25,25 +27,27 @@ export const Provider = ({ children }) => {
                         );
                         oauth.email = payload.email;
                         setCookie("oauth", oauth);
-
                     } else {
                         removeCookie("oauth")
                         setProfile(null)
+                        localStorage.removeItem('profile')
+                        localStorage.removeItem('projects')
                     }
                     setAuth(oauth);
 
                 },
+
                 profile: profile,
                 setProfile: (profile) => {
-                    if (profile) {
-                        setCookie("profile", profile)
-                        setProfile(profile)
-                    } else {
-                        removeCookie("profile");
-                    }
+                    localStorage.setItem('profile', JSON.stringify(profile))
+                    setProfile(profile)
                 },
+
                 projects: projects,
-                setProjects: setProjects,
+                setProjects: (projects) => {
+                    localStorage.setItem('projects', JSON.stringify(projects))
+                    setProjects(projects)
+                },
                 currentProject: currentProject,
                 setCurrentProject: (id) => {
                     const project = projects.find((project) => project.projectId === id)

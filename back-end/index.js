@@ -59,8 +59,15 @@ app.post('/api/google-login', async (req, res) => {
 /*************************************************************
  *                      User Routes
  *************************************************************/
-app.post('/api/getUser', async (req, res) => {
-    userController.get_user(res.params.id, res)
+app.post('/api/getUser', (req, res) => {
+    const googleId = req.body.googleId
+    userController.get_user(googleId,res)
+})
+
+app.post('/api/delete_user_project', (req,res)=>{
+    const project_to_delete_Id = req.body.projectId
+    const profile = req.body.profile
+    userController.delete_user_project(project_to_delete_Id,profile,res)
 })
 
 
@@ -74,15 +81,15 @@ app.post('/api/project', (req, res) => {
 
     project.projectId = projectId
 
-    projectController.create_project(project)
+    projectController.create_project(project,res)
     const user = userController.update_user(project.owner, project)
 
-    res.status(200).send(project)
+    //res.status(200).send(project)
 })
 
 app.post('/api/get_projects', async (req, res) => {
 
-    const projectsId = req.body
+    const projectsId = req.body.projectsId
     const projects = []
 
     const response = await Project.find()
@@ -95,6 +102,16 @@ app.post('/api/get_projects', async (req, res) => {
         })
     })
     res.status(200).send(projects)
+})
+
+app.post('/api/delete_project',async (req,res)=>{
+    const id = req.body.projectId
+    Project.deleteOne({ projectId: id }).then(result=>{
+        res.send(result)
+    })
+    Task.deleteMany({ projectId: id }).then(result=>{
+        console.log('hello')
+    })
 })
 
 

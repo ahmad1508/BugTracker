@@ -11,6 +11,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios'
+import ProjectActions from '../components/ProjectActions'
 
 const useStyles = (theme) => ({
   container: {
@@ -129,27 +130,30 @@ export default function Projects() {
 
 
 const ProjectList = ({ project }) => {
-  const styles = useStyles(useTheme())
-
+  const theme = useTheme()
+  const styles = useStyles(theme)
+  const id = project.projectId
 
   return (
-    <Link to={`/Dashboard/${project.projectId}`} style={{ textDecoration: 'none' }}>
-      <Grid container sx={styles.accordion}>
 
-        <Grid item xs={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>{project.title}  {project.status}</Typography>
-        </Grid>
-        <Grid item xs={8} md={6} lg={6} sx={{ maxHeight: '60px', overflow: 'auto' }}>
-          <Typography variant="caption" >{project.description}</Typography>
-        </Grid>
-        <Grid item xs={0} md={1} lg={1} sx={{ maxHeight: '60px', overflow: 'auto' }}>
-        </Grid>
-        <Grid item xs={12} md={1} lg={1} sx={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
-          <MoreHorizIcon />
-        </Grid>
+    <Grid container sx={styles.accordion}>
 
+      <Grid item xs={12} md={3} lg={3} sx={{ display: 'flex', alignItems: 'center' }}>
+        <Link to={`/Dashboard/${project.projectId}`} style={{ textDecoration: 'none' }}>
+          <Typography variant="h6" sx={{ fontWeight: 600,color:`${theme.palette.secondary.main}` }}>{project.title}</Typography>
+        </Link>
       </Grid>
-    </Link>
+      <Grid item xs={12} md={2} lg={2} sx={{ maxHeight: '60px', overflow: 'auto' }}>
+        <Typography variant="caption">&lt; {project.status} /&gt;</Typography>
+      </Grid>
+      <Grid item xs={8} md={6} lg={6} sx={{ maxHeight: '60px', overflow: 'auto' }}>
+        <Typography variant="caption" >{project.description}</Typography>
+      </Grid>
+      <Grid item xs={12} md={1} lg={1} sx={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
+        <ProjectActions id={id} />
+      </Grid>
+
+    </Grid >
   )
 }
 
@@ -185,7 +189,7 @@ const NewProjectForms = ({ open }) => {
   const [title, setTitle] = useState('')
   const [status, setStatus] = useState('Public')
   const [description, setDescription] = useState('')
-  const { oauth, profile, setProjects ,projects} = useContext(Context)
+  const { oauth, profile, setProjects, projects, setProfile } = useContext(Context)
 
   const handleTitle = (e) => {
     setTitle(e.target.value)
@@ -204,7 +208,7 @@ const NewProjectForms = ({ open }) => {
     setTitle('')
     setStatus('Public')
     setDescription('')
-    console.log(profile.googleId)
+    
     const project = {
       title,
       status,
@@ -213,9 +217,16 @@ const NewProjectForms = ({ open }) => {
       participants: [profile.googleId]
     }
     //add code here
+    
     const { data: res } = await axios.post('http://localhost:5000/api/project', project)
     setProjects([...projects, res])
-    console.log(res)
+
+    const {data:updated_user} = await axios.post('http://localhost:5000/api/getUser',{
+      googleId:profile.googleId
+    })
+
+    setProfile(updated_user)
+
   }
 
   return (

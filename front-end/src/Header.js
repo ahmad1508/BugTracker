@@ -193,21 +193,11 @@ export default function Header({ children }) {
   const styles = useStyles(theme)
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = useState('')
-  const [pathname, setPathname] = useState('')
-  const {setCurrentProject} = useContext(Context)
+  const { setCurrentProject } = useContext(Context)
   const navigate = useNavigate()
 
   const { oauth, setAuth, projects, setProjects, profile } = useContext(Context)
 
-  useEffect(() => {
-    const fetch = async () => {
-      const { data: all_projects } = await axios.post('http://localhost:5000/api/get_projects',
-        profile.projects
-      )
-      setProjects(all_projects)
-    }
-    fetch()
-  }, [oauth, setProjects])
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -228,7 +218,7 @@ export default function Header({ children }) {
         <CssBaseline />
         <AppBar sx={styles.bar} elevation={0}>
           <Toolbar>
-            <Link to="/" sx={{cursor:'pointer'}} onClick={(e) => {
+            <Link to="/" sx={{ cursor: 'pointer' }} onClick={(e) => {
               e.preventDefault()
               setCurrentProject(null)
               navigate('/')
@@ -318,7 +308,7 @@ const DrawerProject = ({ project }) => {
         <ListItemIcon >
           <Avatar sx={styles.avatar}>{project.title[0].toUpperCase()}{project.title[1].toUpperCase()}</Avatar>
         </ListItemIcon>
-        <ListItemText primary='Bug Tracker' />
+        <Box sx={{ overflow: 'hidden' }}><ListItemText primary={`${project.title}`} /></Box>
       </ListItem>
     </Link>
   )

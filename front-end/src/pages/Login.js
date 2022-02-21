@@ -22,7 +22,7 @@ import { useTheme } from '@mui/material/styles';
 import GoogleLogin from 'react-google-login'
 import Context from '../Context'
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-
+import axios from "axios"
 
 
 const useStyles = (theme) => ({
@@ -85,30 +85,30 @@ function Login() {
   const styles = useStyles(useTheme())
 
   return (
-      <Box sx={styles.container}>
-        <Container sx={styles.login}>
-          <Box sx={{ margin: "1rem 0rem 1rem 0rem" }}>
-            <img src="logo_app.png" alt="" />
-          </Box>
+    <Box sx={styles.container}>
+      <Container sx={styles.login}>
+        <Box sx={{ margin: "1rem 0rem 1rem 0rem" }}>
+          <img src="logo_app.png" alt="" />
+        </Box>
 
-          <Typography variant="h6" sx={styles.title}> Login with google</Typography>
+        <Typography variant="h6" sx={styles.title}> Login with google</Typography>
 
-          <Typography variant="" sx={{ marginBottom: "1rem", color: "#9E9E9E" }}>Enter yout credentials to continue</Typography>
+        <Typography variant="" sx={{ marginBottom: "1rem", color: "#9E9E9E" }}>Enter yout credentials to continue</Typography>
 
 
-          <Box variant="" sx={styles.google} >
-            <Google />
-            {/*  <img src="Google.svg" alt="google" height="20px" />
+        <Box variant="" sx={styles.google} >
+          <Google />
+          {/*  <img src="Google.svg" alt="google" height="20px" />
           <Typography variant="" sx={{ marginLeft: "15px" }}>Sign Up With Google</Typography> */}
-          </Box>
+        </Box>
 
-          <Divider sx={{ width: '85%', marginBottom: '2rem' }} >
-            <Box sx={styles.or}>Or</Box>
-          </Divider>
-          <Form />
-          <Account />
-        </Container>
-      </Box>
+        <Divider sx={{ width: '85%', marginBottom: '2rem' }} >
+          <Box sx={styles.or}>Or</Box>
+        </Divider>
+        <Form />
+        <Account />
+      </Container>
+    </Box>
   )
 }
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -245,12 +245,9 @@ export default Login
 
 function Google() {
   const location = useLocation();
-  const { cookies, oauth, setAuth,profile,setProfile } = useContext(Context)
+  const { cookies, oauth, setAuth, profile, setProfile, setProjects } = useContext(Context)
   const [loginData, setLoginData] = useState(cookies)
 
-  /* localStorage.getItem('loginData') ?
-  JSON.parse(localStorage.getItem('loginData'))
-  : null */
   const handleFailure = (result) => {
     alert(result)
   }
@@ -266,14 +263,21 @@ function Google() {
         'Content-Type': 'application/json'
       }
     });
-    
-    const data = await res.json()
-    console.log(data)
-    setLoginData(data)
-    await setProfile(data)
 
-    //localStorage.setItem('loginData', JSON.stringify(data))
-    //set cookies and auth
+    const data = await res.json()
+    setLoginData(data)
+    /*set the profile*/
+    setProfile(data)
+
+    /*get the users projects*/
+    const { data: all_projects } = await axios.post('http://localhost:5000/api/get_projects',
+      {
+        projectsId: data.projects
+      }
+    )
+    setProjects(all_projects)
+    
+    /*set the oauth variable*/
     await setAuth(googleData.wc)
 
   }
