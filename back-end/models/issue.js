@@ -1,10 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const project = new Schema({
+const issue = new Schema({
+    issueId:{
+        type:String,
+        required:true,
+    },
     projectId:{
         type:String,
         required:true,
+    },
+    groupId:{
+        type:String,
+        default:true
     },
     title: {
         type: String,
@@ -13,26 +21,28 @@ const project = new Schema({
     status: {
         type: String,
         required: true,
-        default:'Public'
+        default:'open'
     },
     description: {
         type: String,
         required: false,
         default:'No description'
     },
-    owner: {
+    creator: {
         type: String,
         required: true
     },
-    participants: {
-        type: Array,
-        required: true
+    workingOn: {
+        type: String,
+        required: false,
+        default:""
     },
+    
     createdAt:{
         type:String,
         default:new Date()
     }
 }, { timestamp: true })
 
-const Project = mongoose.model('Project', project)
-module.exports = Project;
+const Issue = mongoose.model('Issue', issue)
+module.exports = Issue;

@@ -19,10 +19,23 @@ const task = new Schema({
         required: true,
         default:'To do'
     },
+    priority:{
+        type:String,
+        required:true,
+        default:'normal'
+    },
     creator: {
         type: String,
         required: true
     },
+    creatorPicture:{
+        type:String,
+        required:false,
+    },
+    createdAt:{
+        type:String,
+        default:new Date()
+    }
 }, { timestamp: true })
 
 const Task = mongoose.model('Task', task)
