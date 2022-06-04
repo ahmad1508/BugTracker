@@ -1,17 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
-import { Box, Typography, Divider, Paper, Container, Grid, Button, TextField } from '@mui/material'
-import Context from '../Context'
-import { Navigate, useLocation, Link } from 'react-router-dom'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Typography, Grid, Button, TextField } from '@mui/material'
+import Context from '../../Context'
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios'
-import ProjectActions from '../components/ProjectActions'
+
+
 
 const useStyles = (theme) => ({
   container: {
@@ -83,108 +81,8 @@ const useStyles = (theme) => ({
 })
 
 
-export default function Projects() {
-  const styles = useStyles(useTheme())
-  const { oauth, setAuth, projects, setProjects, profile } = useContext(Context)
 
-
-
-  return (
-    <Box sx={styles.container}>
-      <Box sx={styles.titleContainer}>
-        <Typography variant="h6" sx={styles.title}>Projects</Typography>
-      </Box>
-      <Divider />
-
-      <Container maxWidth="md" >
-        <Box>
-          <AddProject />
-        </Box>
-
-        <Box sx={styles.projects}>
-
-          <Box sx={styles.header}>
-            <Box>
-              <Typography>Number of projects</Typography>
-            </Box>
-            <Box sx={{ display: 'flex' }}>
-              <Typography>sort</Typography>
-              <ArrowDropDownIcon />
-            </Box>
-          </Box>
-          <Divider sx={{ width: "100%" }} />
-          {projects && projects.map((project) => (
-            <Box>
-              <ProjectList project={project} key={project.projectId} />
-              {(projects.length - 1) !== projects.indexOf(project) && <Divider />}
-
-            </Box>
-          ))}
-
-
-        </Box>
-      </Container>
-    </Box>
-  )
-}
-
-
-const ProjectList = ({ project }) => {
-  const theme = useTheme()
-  const styles = useStyles(theme)
-  const id = project.projectId
-
-  return (
-
-    <Grid container sx={styles.accordion}>
-
-      <Grid item xs={12} md={3} lg={3} sx={{ display: 'flex', alignItems: 'center' }}>
-        <Link to={`/Dashboard/${project.projectId}`} style={{ textDecoration: 'none' }}>
-          <Typography variant="h6" sx={{ fontWeight: 600,color:`${theme.palette.secondary.main}` }}>{project.title}</Typography>
-        </Link>
-      </Grid>
-      <Grid item xs={12} md={2} lg={2} sx={{ maxHeight: '60px', overflow: 'auto' }}>
-        <Typography variant="caption">&lt; {project.status} /&gt;</Typography>
-      </Grid>
-      <Grid item xs={8} md={6} lg={6} sx={{ maxHeight: '60px', overflow: 'auto' }}>
-        <Typography variant="caption" >{project.description}</Typography>
-      </Grid>
-      <Grid item xs={12} md={1} lg={1} sx={{ justifyContent: 'center', display: 'flex', alignItems: 'center' }}>
-        <ProjectActions id={id} />
-      </Grid>
-
-    </Grid >
-  )
-}
-
-
-const AddProject = () => {
-  const styles = useStyles(useTheme())
-  const [open, setOpen] = useState(false)
-
-  const handleClick = (e) => {
-    e.preventDefault();
-    if (open) {
-      setOpen(false);
-    } else {
-      setOpen(true);
-    }
-  }
-
-  return (
-    <Box>
-      <Box sx={styles.buttonSurround}>
-        <Button variant='contained' sx={styles.newButton} onClick={handleClick}>New Project</Button>
-      </Box>
-      {open && <Box style={styles.formSurround}>
-        <NewProjectForms />
-      </Box>}
-
-    </Box>
-  )
-}
-
-const NewProjectForms = ({ open }) => {
+export default function NewProjectForms() {
   const styles = useStyles(useTheme())
   const [title, setTitle] = useState('')
   const [status, setStatus] = useState('Public')
@@ -208,7 +106,7 @@ const NewProjectForms = ({ open }) => {
     setTitle('')
     setStatus('Public')
     setDescription('')
-    
+
     const project = {
       title,
       status,
@@ -217,20 +115,15 @@ const NewProjectForms = ({ open }) => {
       participants: [profile.googleId]
     }
     //add code here
-    
-    const { data: res } = await axios.post('http://localhost:5000/api/project', project)
-    setProjects([...projects, res])
 
-    const {data:updated_user} = await axios.post('http://localhost:5000/api/getUser',{
-      googleId:profile.googleId
-    })
+    const { data: response  } = await axios.post('http://localhost:5000/project/create_project', project)
 
-    setProfile(updated_user)
-
+    setProjects([...projects, response.project])
+    setProfile(response.user)
   }
 
   return (
-    <Grid container sx={{ width: '100%' }} open={open}>
+    <Grid container sx={{ width: '100%' }} >
       <Grid item xs={12} md={12} lg={12}>
         <Typography variant="h6">Add New Project</Typography>
       </Grid>

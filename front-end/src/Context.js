@@ -12,6 +12,7 @@ export const Provider = ({ children }) => {
     const [projects, setProjects] = useState(localStorage.getItem('projects') ?
         JSON.parse(localStorage.getItem('projects')) : null)
     const [currentProject, setCurrentProject] = useState(null)
+    const [currentProjectParticipants,setCurrentParticipants]=useState()
 
     return (
         <Context.Provider
@@ -52,7 +53,9 @@ export const Provider = ({ children }) => {
                 setCurrentProject: (id) => {
                     const project = projects.find((project) => project.projectId === id)
                     setCurrentProject(project)
-                }
+                },
+                currentProjectParticipants:currentProjectParticipants,
+                setCurrentParticipants:setCurrentParticipants
             }}
         >
             {children}

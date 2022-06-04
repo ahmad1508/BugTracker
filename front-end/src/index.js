@@ -4,6 +4,9 @@ import { CookiesProvider } from "react-cookie";
 import "./index.css";
 import App from "./App";
 import { Provider as ContextProvider } from "./Context";
+import { Provider as TaskContextProvider } from "./TaskContext";
+import { Provider as IssueContextProvider } from "./IssueContext";
+
 import * as serviceWorker from "./serviceWorker";
 // Layout
 import { BrowserRouter as Router } from "react-router-dom";
@@ -11,11 +14,15 @@ import { BrowserRouter as Router } from "react-router-dom";
 ReactDOM.render(
   <React.StrictMode>
     <ContextProvider>
-      <CookiesProvider>
-        <Router>
-          <App />
-        </Router>
-      </CookiesProvider>
+      <TaskContextProvider>
+        <IssueContextProvider>
+          <CookiesProvider>
+            <Router>
+              <App />
+            </Router>
+          </CookiesProvider>
+        </IssueContextProvider>
+      </TaskContextProvider>
     </ContextProvider>
   </React.StrictMode>,
   document.getElementById("root")

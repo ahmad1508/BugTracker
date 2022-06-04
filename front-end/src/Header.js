@@ -9,25 +9,22 @@ import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import SearchIcon from '@mui/icons-material/Search';
 import InputUnstyled from '@mui/base/InputUnstyled';
-import InputAdornment from '@mui/material/InputAdornment';
 import Button from '@mui/material/Button';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Avatar from '@mui/material/Avatar';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import axios from 'axios'
 import Context from './Context'
+import Background from './components/Container/Background'
+import ProjectAddingButton from './components/Projects/ProjectAddingButton';
 
-const drawerWidth = 240;
+const drawerWidth = 210;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -48,9 +45,9 @@ const closedMixin = (theme) => ({
   overflowX: 'hidden',
   border: 'none',
   marginRight: '10px',
-  width: `calc(${theme.spacing(7)} + 1px)`,
+  width: `calc(${theme.spacing(0)} + 0px)`,
   [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(9)} + 1px)`,
+    width: `calc(${theme.spacing(0)} + 0px)`,
   },
 });
 
@@ -195,7 +192,6 @@ export default function Header({ children }) {
   const [search, setSearch] = useState('')
   const { setCurrentProject } = useContext(Context)
   const navigate = useNavigate()
-
   const { oauth, setAuth, projects, setProjects, profile } = useContext(Context)
 
   const handleDrawerOpen = () => {
@@ -246,12 +242,12 @@ export default function Header({ children }) {
           </Toolbar>
         </AppBar>
 
-        <Drawer variant="permanent" open={open} >
+        <Drawer variant="permanent" open={open}>
           <DrawerHeader>
 
           </DrawerHeader>
 
-          <List sx={{ marginRight: "10px" }}>
+          <List sx={{ marginRight: "10px", height: '90%', }}>
 
             {open ?
               <Typography sx={styles.label} variant="subtitle1" display="block" >
@@ -261,19 +257,30 @@ export default function Header({ children }) {
                 Projects
               </Typography>
             }
+            <Box sx={{
+              maxHeight: '80vh',
+              overflow: 'hidden'
+            }}>
+              {projects && projects.map(project => (
+                <DrawerProject project={project} key={project.projectId} />
+              ))}
 
-            {projects && projects.map(project => (
-              <DrawerProject project={project} key={project.projectId} />
-            ))}
+            </Box>
 
 
           </List>
+
+
+          <ProjectAddingButton />
+
 
         </Drawer>
 
         <Box component="main" sx={{ flexGrow: 1 }}>
           <DrawerHeader />
-          {children}
+          <Background>
+            {children}
+          </Background>
         </Box>
       </Box>
     </Box >
@@ -294,10 +301,11 @@ const DrawerProject = ({ project }) => {
   return (
     <Link
       to={`/Dashboard/${project.projectId}`}
-      style={{
+      sx={{
         display: 'flex',
         textDecoration: 'none',
         color: `${theme.palette.secondary.main}`
+
       }}
       onClick={(e) => {
         e.preventDefault()

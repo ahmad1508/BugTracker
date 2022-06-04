@@ -4,15 +4,17 @@ import {
   Routes,
   Navigate, useLocation
 } from "react-router-dom";
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Background from './components/Background'
 import './App.css'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
+import Login from './pages/Login/Login'
+import Dashboard from './pages/Dashboard/Dashboard'
+import Issues from './pages/Issues/Issues'
+import Settings from './pages/Settings/Settings'
+
 import Context from "./Context";
 //import DashList from './pages/DashList'
-import Projects from './pages/Projects'
+import Projects from './pages/Projects/Projects'
 
 import Header from './Header'
 import Footer from './Footer'
@@ -36,7 +38,7 @@ const theme = createTheme({
       darkest: '#4527A0'
     },
     success: {
-      main: '#69F0AE',
+      main: '#00C853',
       light: '#B9F6CA',
       medium: '#69F0AE',
       dark: '#00C853',
@@ -51,6 +53,21 @@ const theme = createTheme({
       700: '#616161',
       900: '#212121',
     },
+    orange: {
+      50: '#fff3e0',
+      100: '#ffe0b2',
+      200: '#ffcc80',
+      300: '#ffb74d',
+      400: '#ffa726',
+      500: '#ff9800',
+      600: '#fb8c00',
+      700: '#f57c00',
+      800: '#ef6c00',
+      900: '#e65100',
+    },
+    green: {
+      500: '#4caf50'
+    }
 
   },
 });
@@ -90,8 +107,10 @@ function App() {
       <CssBaseline />
       <Routes>
         <Route path="/Login" element={oauth ? goDash : <Login />} />
-        <Route path="/" element={oauth ? <Header ><Background><Projects /></Background></Header> : goHome} />
-        <Route path="/Dashboard/:id/" element={oauth ? <Header ><Background><Dashboard /></Background></Header> : goHome} />
+        <Route path="/" element={oauth ? <Header ><Projects /></Header> : goHome} />
+        <Route path="/Dashboard/:id/" element={oauth ? <Header ><Dashboard /></Header> : goHome} />
+        <Route path="/Issues/:id/" element={oauth ? <Header ><Issues /></Header> : goHome} />
+        <Route path="/Settings/:id/" element={oauth ? <Header ><Settings /></Header> : goHome} />
       </Routes>
 
 

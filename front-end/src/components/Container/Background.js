@@ -1,9 +1,6 @@
-import React, { useContext,useEffect } from 'react'
+import React from 'react'
 import { useTheme } from '@mui/material/styles'
 import { Box } from '@mui/material'
-import Context from '../Context'
-import { Navigate, useLocation } from 'react-router-dom'
-import axios from 'axios'
 
 const useStyles = (theme) => ({
     container: {
@@ -22,9 +19,9 @@ const useStyles = (theme) => ({
 })
 
 
-export default function Dashboard({children}) {
+export default function Dashboard({ children }) {
     const styles = useStyles(useTheme())
-   
+
     return (
         <Box className='dashboard' sx={styles.container}>
             {children}

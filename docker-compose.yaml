@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+  frontend:
+    build: ./front-end
+    image: my-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+
+  backend:
+    build: ./back-end
+    image: my-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    networks:
+      - backend
+      - db
+
+  db:
+    image: mongo
+    restart: always
+    networks:
+      - db
+
+networks:
+  backend: {}
+  db: {}

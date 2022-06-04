@@ -6,11 +6,11 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import Divider from '@mui/material/Divider';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios'
-import Context from '../Context';
+import Context from '../../Context';
+
 const StyledMenu = styled((props) => (
     <Menu
         elevation={0}
@@ -64,7 +64,7 @@ export default function ProjectActions({ id }) {
     const theme = useTheme()
     const styles = useStyles(theme)
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const { projects, setProjects, profile,setProfile } = useContext(Context)
+    const { projects, setProjects, profile, setProfile } = useContext(Context)
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -72,19 +72,17 @@ export default function ProjectActions({ id }) {
     const handleDelete = async (e) => {
         e.preventDefault()
         setAnchorEl(null);
-        const { data: deleted } = await axios.post('http://localhost:5000/api/delete_project', {
-            projectId
-        })
-        console.log(deleted)
+
+        /* DELETE PROJECT FROM DATABASE */
+        await axios.post(`http://localhost:5000/project/delete_project/${projectId}`)
         const projs = projects.filter((project) => project.projectId !== projectId)
         setProjects(projs)
-
-        console.log(profile)
-        const { data: updated_user } = await axios.post('http://localhost:5000/api/delete_user_project', {
+        /* UPDATE USER PROJECTS IN DATABASE AFTER DELETE*/
+        const { data: updated_user } = axios.post('http://localhost:5000/user/delete_user_project', {
             projectId,
             profile
         })
-        setProfile(updated_user)
+        setProfile(profile)
     };
 
 

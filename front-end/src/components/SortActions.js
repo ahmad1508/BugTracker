@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { useTheme } from '@mui/styles'
+import {useNavigate} from 'react-router-dom'
 import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -11,6 +12,12 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios'
 import Context from '../Context';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import SortIcon from '@mui/icons-material/Sort';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { bottomNavigationClasses } from '@mui/material';
+
 const StyledMenu = styled((props) => (
     <Menu
         elevation={0}
@@ -54,59 +61,53 @@ const StyledMenu = styled((props) => (
 
 const useStyles = (theme) => ({
     button: {
-        color: "#000"
+        color: "#000",
+        width: "5px"
     }
 })
 
 
-export default function ProjectActions({ id }) {
-    const projectId = id
+export default function SortActions() {
     const theme = useTheme()
     const styles = useStyles(theme)
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const { projects, setProjects, profile,setProfile } = useContext(Context)
+    const { projects, setProjects, profile, setProfile } = useContext(Context)
     const open = Boolean(anchorEl);
+    const navigate = useNavigate()
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleDelete = async (e) => {
-        e.preventDefault()
-        setAnchorEl(null);
-        const { data: deleted } = await axios.post('http://localhost:5000/api/delete_project', {
-            projectId
-        })
-        console.log(deleted)
-        const projs = projects.filter((project) => project.projectId !== projectId)
-        setProjects(projs)
 
-        console.log(profile)
-        const { data: updated_user } = await axios.post('http://localhost:5000/api/delete_user_project', {
-            projectId,
-            profile
-        })
-        setProfile(updated_user)
-    };
-
-
-    const handleEdit = (e) => {
-
+    const handleSortTime = (e) => {
+        let allprojects = projects
+        allprojects.sort((a, b) => (a.createdAt < b.createdAt) ? 1 : ((b.createdAt < a.createdAt) ? -1 : 0))
+        setProjects(allprojects)
+        navigate('/')
     }
+    const handleSortOldest = (e) => {
+        let allprojects = projects
+        allprojects.sort((a, b) => (a.createdAt > b.createdAt) ? 1 : ((b.createdAt > a.createdAt) ? -1 : 0))
+        setProjects(allprojects)
+        navigate('/')
+    }
+
+
     const handleClose = () => {
         setAnchorEl(null);
     }
     return (
         <div>
-            <Button
+            <div
                 id="demo-customized-button"
                 aria-controls={open ? 'demo-customized-menu' : undefined}
-                aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
+                aria-haspopup="true"
                 sx={styles.button}
-                disableElevation
+
                 onClick={handleClick}
             >
-                <MoreHorizIcon />
-            </Button>
+                <ArrowDropDownIcon />
+            </div>
             <StyledMenu
                 id="demo-customized-menu"
                 MenuListProps={{
@@ -116,15 +117,15 @@ export default function ProjectActions({ id }) {
                 open={open}
                 onClose={handleClose}
             >
-                <MenuItem onClick={(e) => handleEdit(e)} disableRipple>
-                    <EditIcon />
-                    Edit Project
+                <MenuItem onClick={(e) => handleSortTime(e)} disableRipple>
+                    <ArrowUpwardIcon />
+                    Sort by newest
                 </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
-                <MenuItem onClick={(e) => handleDelete(e)} disableRipple>
-                    <DeleteIcon />
-                    Delete Project
-                </MenuItem>
+                <MenuItem onClick={(e) => handleSortOldest(e)} disableRipple>
+                    <ArrowDownwardIcon/>
+                    Sort by Oldest
+                </MenuItem> 
             </StyledMenu>
         </div >
     );
