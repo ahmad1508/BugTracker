@@ -112,10 +112,7 @@ function App() {
         <Route path="/Issues/:id/" element={oauth ? <Header ><Issues /></Header> : goHome} />
         <Route path="/Settings/:id/" element={oauth ? <Header ><Settings /></Header> : goHome} />
       </Routes>
-
-
-
-    </ThemeProvider >
+    </ThemeProvider>
   );
 }
 

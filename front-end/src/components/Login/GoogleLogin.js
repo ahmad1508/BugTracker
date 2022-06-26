@@ -38,9 +38,9 @@ export default function Google() {
     )
 
     setProjects(all_projects)
-    console.log(googleData.xc)
+    console.log(googleData.Cc)
     /*set the oauth variable*/
-    await setAuth(googleData.xc)
+    await setAuth(googleData.Cc)
 
   }
 
